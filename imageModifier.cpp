@@ -1,19 +1,20 @@
-// Program: ImageModifier.cpp
-// Purpose: Demonstrate use of bmplip for handling
-//          bmp colored and grayscale images
-//          Program load a gray image and store in another file
-//          Program will display various filters and apply it for the specified image
-// Author:  Mohamed El-Ramly
-// Devs  :  Ahmed Niazi(20220452) & Omer Tarek(20220438)
-// emails:  ahmedniazi24a.b@gmail.com & omertarek131@gmail.com
-// Date:    5 Ocotber 2023
-// Version: 1.0
+// FCAI – OOP Programming – 2023 - Assignment 1
+// Program Name:				imageModifier.cpp
+// Last Modification Date:	7/10/2023
+// Author1 and ID and Group:	Ahmed Niazi 20220452
+// Author2 and ID and Group:	Omer Tarek 20220438
+// Author3 and ID and Group:
+// Teaching Assistant:
+// Purpose: Apply a variety of filters on grayscale bmp images
+
 
 #include <iostream>
-#include <fstream>
+#include <string>
 #include <cstring>
 #include <cmath>
+#include <vector>
 #include "bmplib.cpp"
+/*#include <fstream>*/
 
 using namespace std;
 unsigned char image[SIZE][SIZE];
@@ -25,6 +26,8 @@ void loadImage();
 void saveImage();
 /*------------------*/
 void menu();
+void menu1(string & s);
+void menu2(string & s);
 void blackWhiteImage();
 void invertImage();
 void mergeImageLoad();
@@ -38,20 +41,24 @@ void lightenImage();
 void rotate90();
 void rotate180();
 void rotate360();
-
+void detectImageEdges();
+void enlargeImage(const string & s);
+void shrinkImage(const string& shrink_by);
+void mirrorHalfImage(const char & direction);
+void blurImage();
+void cropImage(int x, int y, int l, int w);
 
 int main()
 {
     cout << "Welcome our Dear User :) \n\n";
     loadImage();
     menu();
-    cout << "The image has been processed successfully :)\n\n";
     return 0;
 }
 
 
 void menu() {
-    int selection;
+    string selection;
     cout << "Please select a filter to apply or 0 to exit:" << endl;
     cout << "---------------------------------------------" << endl;
     cout << "1.  Convert to Black and White" << endl;
@@ -64,20 +71,43 @@ void menu() {
     cout << "7.  Detect Image Edges" << endl;
     cout << "8.  Enlarge Image" << endl;
     cout << "9.  Shrink Image" << endl;
-    cout << "10. Mirror 1/2 Image" << endl;
-    cout << "11. Shuffle Image" << endl;
-    cout << "12. Blur Image" << endl;
-    cout << "13. Crop Image" << endl;
-    cout << "14. Skew Image Right" << endl;
-    cout << "15. Skew Image Up" << endl;
-    cout << "16. Save the image to a file" << endl;
+    cout << "a. Mirror 1/2 Image" << endl;
+    cout << "b. Shuffle Image" << endl;
+    cout << "c. Blur Image" << endl;
+    cout << "d. Crop Image" << endl;
+    cout << "e. Skew Image Right" << endl;
+    cout << "f. Skew Image Up" << endl;
+    cout << "s. Save the image to a file" << endl;
     cout << "-----end-----" << endl;
     cout << "0.  Exit" << endl;
     cout << "---------------------------------------------" << endl;
-    cout << "Enter your choice: ";
-    cin >> selection;
+    cout << "Enter your choice: ";    cin >> selection;
+    cout << endl;
 
+    if (selection == "0" || selection == "1" || selection == "2" || selection == "3" || selection == "4" || selection == "5" || selection == "6" || selection == "7" || selection == "8" || selection == "9")
+        menu1(selection);
+    else if (selection == "a" || selection == "b" || selection == "c" || selection == "d" || selection == "e" || selection == "f" || selection == "s")
+        menu2(selection);
+    else {
+        int anns;
+        cout << "Invalid choice, Please press 0 to exit or 1 to choose again from the menu: ";
+        cin >> anns;
+        cout << endl;
+        if (anns == 0) {
+            cout << "Thank you for using our program :)" << endl;
+            return;
+        } else if (anns == 1) {
+            menu();
+        }
+    }
+}
+void menu1(string & s) {
+    int selection = stoi(s);
     switch (selection) {
+        case 0:
+            // Exit
+            cout << "Thank you for using our program :)" << endl;
+            break;
         case 1:
             // Convert to Black and White
             blackWhiteImage();
@@ -100,11 +130,11 @@ void menu() {
             cout << "Flip (h)orizontally or (v)ertically or (b)oth?\t";
             cin >> ans;
             cout << endl;
-            if(ans == 'h')
+            if (ans == 'h')
                 flipImageHorizontally();
-            else if(ans == 'v')
+            else if (ans == 'v')
                 flipImageVertically();
-            else if(ans == 'b')
+            else if (ans == 'b')
                 flipVerticalHorizontal();
             saveImage3();
             break;
@@ -114,9 +144,9 @@ void menu() {
             cout << "Do you want to (d)arken or (l)ighten?\t";
             cin >> answer;
             cout << endl;
-            if(answer == 'd')
+            if (answer == 'd')
                 darkenImage();
-            else if(answer == 'l')
+            else if (answer == 'l')
                 lightenImage();
             saveImage();
             break;
@@ -124,48 +154,33 @@ void menu() {
             // Rotate Image
             int answe;
             cout << "Rotate (90), (180) or (360) degrees?\t";
-            cin >> answe; cout << endl;
-            if(answe == 90)
+            cin >> answe;
+            cout << endl;
+            if (answe == 90)
                 rotate90();
-            else if(answe == 180)
+            else if (answe == 180)
                 rotate180();
-            else if(answe == 360)
+            else if (answe == 360)
                 rotate360();
             saveImage3();
             break;
-        case 7:
-            // Detect Image Edges
-            break;
-        case 8:
-            // Enlarge Image
-            break;
+//        case 7:
+//            // Detect Image Edges
+//            break;
+//        case 8:
+//            // Enlarge Image
+//            /*string enlarge;
+//            cout << "Which quarter to enlarge 1, 2, 3 or 4?\t";
+//            cin >> enlarge; cout << endl;
+//            enlargeImage(enlarge);
+//            saveImage3();*/
+//            break;
         case 9:
             // Shrink Image
-            break;
-        case 10:
-            // Mirror 1/2 Image
-            break;
-        case 11:
-            // Shuffle Image
-            break;
-        case 12:
-            // Blur Image
-            break;
-        case 13:
-            // Crop Image
-            break;
-        case 14:
-            // Skew Image Right
-            break;
-        case 15:
-            // Skew Image Up
-            break;
-        case 16:
-            // Save the image to a file
-            break;
-        case 0:
-            // Exit
-            cout << "Thank you for using our program :)" << endl;
+            int shrink;
+            cout << "Shrink to (1/2), (1/3) or (1/4)?\t";
+            cin >> shrink;
+            cout << endl;
             break;
         default:
             int anns;
@@ -174,12 +189,64 @@ void menu() {
             cout << endl;
             if (anns == 0) {
                 cout << "Thank you for using our program :)" << endl;
-                break; }
-            else if (anns == 1) {
-                menu();}
+                break;
+            } else if (anns == 1) {
+                menu();
+            }
     }
 }
-
+void menu2(string & s) {
+    if (s == "a") {
+        // Mirror 1/2 Image
+        char direction;
+        cout << "Mirror (l)eft, (r)ight, (u)pper, (d)own side?\t";
+        cin >> direction;
+        cout << endl;
+        if (direction == 'l' || direction == 'r' || direction == 'u' || direction == 'd') {
+            mirrorHalfImage(direction), saveImage3();
+        }else {
+            cout << "Invalid direction!\n";
+            menu();
+        }
+    }else if (s == "b") {
+        // Shuffle Image
+        cout << "Under Development\n";
+        menu();
+    }else if (s == "c") {
+        // Blur Image
+        blurImage();
+        saveImage3();
+    }else if (s == "d") {
+        // Crop Image
+        int x, y, l, w;
+        cout << "Please enter x y l w: \t";
+        cin >> x >> y >> l >> w; cout << endl;
+        cropImage(x, y, l, w);
+        saveImage3();
+    }else if (s == "e") {
+        // Skew Image Right
+        cout << "Under Development\n";
+        menu();
+    }else if (s == "f") {
+        // Skew Image Up
+        cout << "Under Development\n";
+        menu();
+    }else if (s == "s") {
+        // Save the image to a file
+        saveImage();
+    }else {
+        int anns;
+        cout << "Invalid choice, Please press 0 to exit or 1 to choose again from the menu: ";
+        cin >> anns;
+        cout << endl;
+        if (anns == 0) {
+            cout << "Thank you for using our program :)" << endl;
+        }
+        else if (anns == 1) {
+            menu();
+        }
+    }
+}
 //_________________________________________
 void loadImage() {
     char imageFileName[100];
@@ -316,6 +383,105 @@ void rotate360() {
         }
     }
 }
+void detectImageEdges() {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++){
 
+        }
+    }
+}
+void enlargeImage(const string & s){
+    int quarter = stoi(s);
+    int loop = SIZE/4*quarter-(SIZE/4);
+    int period = 4, period2 = 4;
 
+    for(int i =0, l = loop; i < SIZE; i++){
+        if(!period && l +1 < loop +64)l++, period = 4;
+        else if(period -1)period--;
+        for(int j = 0, k = loop ; j < SIZE; j++){
+            if(!period2 && k +1 < loop +64)k++, period2 = 4;
+            else if(period2 -1)period2--;
+            image3[i][j] = image[l][k];
+        }
+    }
+}
+void shrinkImage(const string& shrink_by){
+    string last_char = shrink_by.substr(shrink_by.length()-1, 1);
+    int shrink = stoi(last_char);
+    int new_size = SIZE/shrink;
+    for(int i =0, l = 0; i < new_size; i++, l += shrink)
+    {
+        for(int j = 0, k = 0; j < new_size; j++, k+= shrink)
+        {
+            image3[i][j] = image[l][k];
+        }
+    }
+}
+void mirrorHalfImage(const char & direction) {
+    if(direction == 'l')
+    {
+        int add = 1, k=0;
+        for(int i = 0; i < SIZE; i++) {
+            for(int j = 0; j < SIZE; j++) {
+                if(j == SIZE/2)add=0;
+                if(add)k++;
+                else k--;
+                if(!add && !k)add=1;
+                image3[i][j] = image[i][k];
+            }
+        }
+    }
+    else if(direction == 'r')
+    {
+        int k = 255, minus = 1;
+        for(int i = 0; i < SIZE; i++) {
+            for(int j = 0; j < SIZE; j++) {
+                if(j == SIZE/2)minus=0;
+                if(minus)k--;
+                else k++;
+                if(!minus && k == 255)minus=1;
+                image3[i][j] = image[i][k];
+            }
+        }
+    }
+    else if(direction == 'u') {
+        int add = 1, l = 0;
+        for(int i = 0; i < SIZE ; i++) {
+            if(i == SIZE/2)add=0;
+            if(add)l++;
+            else l--;
+            if(!add && !l)add=1;
+            for(int j = 0; j < SIZE; j++) {
+                image3[i][j] = image[l][j];
+            }
+        }
+    }
+    else
+    {
+        int l = 255, minus = 1;
+        for(int i = 0; i < SIZE; i++) {
+            if(i == SIZE/2)minus=0;
+            if(minus)l--;
+            else l++;
+            if(!minus && l == 255)minus=1;
+            for(int j = 0; j < SIZE; j++) {
+                image3[i][j] = image[l][j];
+            }
+        }
+    }
+}
+void blurImage() {
+    for(int i =0; i < SIZE; i++){
+        for(int j = 0; j < SIZE; j++){
+            image3[i][j] = (image[i][j] + image[i+3][j] + image[i-3][j] + image[i][j+3] + image[i][j-3] + image[i+2][j+2] + image[i-2][j-2])/7;
+        }
+    }
+}
+void cropImage(int x, int y, int l, int w) {
+    for(int i =0, k = x; i < l; i++, k++){
+        for(int j = 0, m = y; j < w; j++, m++){
+            image3[i][j] = image[k][m];
+        }
+    }
+}
 
