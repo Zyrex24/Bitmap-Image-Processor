@@ -12,9 +12,9 @@
 #include <string>
 #include <cstring>
 #include <cmath>
-#include <vector>
 #include "bmplib.cpp"
-/*#include <fstream>*/
+/*#include <vector>
+#include <fstream>*/
 
 using namespace std;
 unsigned char image[SIZE][SIZE];
@@ -42,11 +42,13 @@ void rotate90();
 void rotate180();
 void rotate360();
 void detectImageEdges();
-void enlargeImage(const string & s);
+void enlargeImage(const string &quarter);
 void shrinkImage(const string& shrink_by);
 void mirrorHalfImage(const char & direction);
+void shuffleImage(const int quarters[]);
 void blurImage();
 void cropImage(int x, int y, int l, int w);
+
 
 int main()
 {
@@ -71,13 +73,13 @@ void menu() {
     cout << "7.  Detect Image Edges" << endl;
     cout << "8.  Enlarge Image" << endl;
     cout << "9.  Shrink Image" << endl;
-    cout << "a. Mirror 1/2 Image" << endl;
-    cout << "b. Shuffle Image" << endl;
-    cout << "c. Blur Image" << endl;
-    cout << "d. Crop Image" << endl;
-    cout << "e. Skew Image Right" << endl;
-    cout << "f. Skew Image Up" << endl;
-    cout << "s. Save the image to a file" << endl;
+    cout << "a.  Mirror 1/2 Image" << endl;
+    cout << "b.  Shuffle Image" << endl;
+    cout << "c.  Blur Image" << endl;
+    cout << "d.  Crop Image" << endl;
+    cout << "e.  Skew Image Right" << endl;
+    cout << "f.  Skew Image Up" << endl;
+    cout << "s.  Save the image to a file" << endl;
     cout << "-----end-----" << endl;
     cout << "0.  Exit" << endl;
     cout << "---------------------------------------------" << endl;
@@ -102,6 +104,7 @@ void menu() {
     }
 }
 void menu1(string & s) {
+    string choice;
     int selection = stoi(s);
     switch (selection) {
         case 0:
@@ -164,23 +167,23 @@ void menu1(string & s) {
                 rotate360();
             saveImage3();
             break;
-//        case 7:
-//            // Detect Image Edges
-//            break;
-//        case 8:
-//            // Enlarge Image
-//            /*string enlarge;
-//            cout << "Which quarter to enlarge 1, 2, 3 or 4?\t";
-//            cin >> enlarge; cout << endl;
-//            enlargeImage(enlarge);
-//            saveImage3();*/
-//            break;
+        case 7:
+            // Detect Image Edges
+            break;
+        case 8:
+            // Enlarge Image
+            cout << "Which quarter to enlarge 1, 2, 3 or 4?\t";
+            cin >> choice;
+            if(stoi(choice) >=1 && stoi(choice) <=4){
+                enlargeImage(choice), saveImage3();
+                break;}
+            else {cout <<"Invalid number!\n";menu();}
         case 9:
             // Shrink Image
-            int shrink;
             cout << "Shrink to (1/2), (1/3) or (1/4)?\t";
-            cin >> shrink;
-            cout << endl;
+            cin >> choice;
+            shrinkImage(choice);
+            saveImage3();
             break;
         default:
             int anns;
@@ -210,8 +213,11 @@ void menu2(string & s) {
         }
     }else if (s == "b") {
         // Shuffle Image
-        cout << "Under Development\n";
-        menu();
+        int quarters[4];
+        cout << "New order of quarters ?\t";
+        cin >> quarters[0] >> quarters[1] >> quarters[2] >> quarters[3]; cout << endl;
+        shuffleImage(quarters);
+        saveImage3();
     }else if (s == "c") {
         // Blur Image
         blurImage();
@@ -390,24 +396,29 @@ void detectImageEdges() {
         }
     }
 }
-void enlargeImage(const string & s){
-    int quarter = stoi(s);
-    int loop = SIZE/4*quarter-(SIZE/4);
-    int period = 4, period2 = 4;
-
-    for(int i =0, l = loop; i < SIZE; i++){
-        if(!period && l +1 < loop +64)l++, period = 4;
-        else if(period -1)period--;
-        for(int j = 0, k = loop ; j < SIZE; j++){
-            if(!period2 && k +1 < loop +64)k++, period2 = 4;
-            else if(period2 -1)period2--;
+void enlargeImage(const string &quarter) {
+    int l_start, k_start, val = stoi(quarter);
+    l_start = (val >2?128:0);
+    k_start = (val % 2 == 0?128:0);
+    for (int i = 0, l = l_start, p = 2; i < SIZE; i++) {
+        for (int j = 0, k = k_start, p2 = 0; j < SIZE; j++) {
             image3[i][j] = image[l][k];
+
+            if (!p2) k++,p2 = 1;
+            else p2--;
+
         }
+
+        if (!p) l++,p = 1;
+        else p--;
+
     }
 }
 void shrinkImage(const string& shrink_by){
     string last_char = shrink_by.substr(shrink_by.length()-1, 1);
-    int shrink = stoi(last_char);
+
+    float shrink = stoi(last_char);
+
     int new_size = SIZE/shrink;
     for(int i =0, l = 0; i < new_size; i++, l += shrink)
     {
@@ -470,6 +481,28 @@ void mirrorHalfImage(const char & direction) {
         }
     }
 }
+void shuffleImage(const int quarters[]) {
+    for(int i =0, start = (quarters[0] >2?128:0); i < SIZE/2;i++, start ++) {
+        for(int j =0, start2 = (quarters[0] %2 ==0?128:0); j <SIZE/2;j++, start2 ++) {
+            image3[i][j] = image[start][start2];
+        }
+    }
+    for(int i =0, start = (quarters[1] >2?128:0); i < SIZE/2;i++, start ++) {
+        for(int j =128, start2 = (quarters[1] %2 ==0?128:0); j <SIZE;j++, start2 ++) {
+            image3[i][j] = image[start][start2];
+        }
+    }
+    for(int i =128, start = (quarters[2] >2?128:0); i < SIZE;i++, start ++) {
+        for(int j =0, start2 = (quarters[2] %2 ==0?128:0); j <SIZE/2;j++, start2 ++) {
+            image3[i][j] = image[start][start2];
+        }
+    }
+    for(int i =128, start = (quarters[3] >2?128:0); i < SIZE;i++, start ++) {
+        for(int j =128, start2 = (quarters[3] %2 ==0?128:0); j <SIZE;j++, start2 ++) {
+            image3[i][j] = image[start][start2];
+        }
+    }
+}
 void blurImage() {
     for(int i =0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
@@ -478,10 +511,24 @@ void blurImage() {
     }
 }
 void cropImage(int x, int y, int l, int w) {
-    for(int i =0, k = x; i < l; i++, k++){
-        for(int j = 0, m = y; j < w; j++, m++){
-            image3[i][j] = image[k][m];
+    for (int i = x; i < x+l; i++) {
+        for (int j = y; j < y+w; j++) {
+            image3[i][j] = image[i][j];
         }
     }
 }
+/*void skewImageRight() {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++){
+
+        }
+    }
+}
+void skewImageUp() {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++){
+
+        }
+    }
+}*/
 
