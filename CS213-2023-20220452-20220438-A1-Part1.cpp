@@ -1,6 +1,6 @@
 // FCAI – OOP Programming – 2023 - Assignment 1
 // Program Name:				imageModifier.cpp
-// Last Modification Date:	9/10/2023
+// Last Modification Date:	7/10/2023
 // Author1 and ID and Group:	Ahmed Niazi 20220452
 // Author2 and ID and Group:	Omer Tarek 20220438
 // Author3 and ID and Group:
@@ -48,6 +48,8 @@ void mirrorHalfImage(const char & direction);
 void shuffleImage(const int quarters[]);
 void blurImage();
 void cropImage(int x, int y, int l, int w);
+void skewImageRight();
+void skewImageUp();
 
 
 int main()
@@ -169,6 +171,8 @@ void menu1(string & s) {
             break;
         case 7:
             // Detect Image Edges
+            detectImageEdges();
+            saveImage();
             break;
         case 8:
             // Enlarge Image
@@ -390,9 +394,15 @@ void rotate360() {
     }
 }
 void detectImageEdges() {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++){
-
+    for(int i = 1; i < SIZE-1;i++) {
+        for(int j =1; j < SIZE-1; j++) {
+            if(abs(image[i-1][j]-image[i][j])>=40)image[i-1][j]=0;
+            else if(abs(image[i][j-1]-image[i][j])>=40)image[i][j]=0;
+        }
+    }
+    for(auto & i : image) {
+        for(int j = 0; j < SIZE; j++) {
+            if(i[j] || (j+1 <SIZE && i[j] == i[j+1]))i[j] =255;
         }
     }
 }
@@ -517,18 +527,12 @@ void cropImage(int x, int y, int l, int w) {
         }
     }
 }
-/*void skewImageRight() {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++){
-
-        }
-    }
+//Under Development
+void skewImageRight() {
+    cout << "Under Development\n";
+    menu();
 }
 void skewImageUp() {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++){
-
-        }
-    }
-}*/
-
+    cout << "Under Development\n";
+    menu();
+}
