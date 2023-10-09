@@ -62,6 +62,7 @@ int main()
 
 
 void menu() {
+    // Here we print the menu and take the user's choice.
     string selection;
     cout << "Please select a filter to apply or 0 to exit:" << endl;
     cout << "---------------------------------------------" << endl;
@@ -105,6 +106,7 @@ void menu() {
         }
     }
 }
+// Here we take the user's choice (ranging from 0-9) and apply the filter on the image.
 void menu1(string & s) {
     string choice;
     int selection = stoi(s);
@@ -203,6 +205,7 @@ void menu1(string & s) {
     }
 }
 void menu2(string & s) {
+    // Here we take the user's choice (ranging from a-f,s) and apply the filter on the image.
     if (s == "a") {
         // Mirror 1/2 Image
         char direction;
@@ -259,6 +262,7 @@ void menu2(string & s) {
 }
 //_________________________________________
 void loadImage() {
+    // Here we load the image from the user's input.
     char imageFileName[100];
 
     // Get gray scale image file name
@@ -272,6 +276,7 @@ void loadImage() {
 }
 //_________________________________________
 void saveImage() {
+    // Here we save the image to the user's input.
     char imageFileName[100];
 
     // Get gray scale image target file name
@@ -284,6 +289,7 @@ void saveImage() {
 }
 //_________________________________________
 void blackWhiteImage() {
+    // Here we reassign every pixel to either 0 or 255
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             if (image[i][j] > 127)
@@ -294,6 +300,7 @@ void blackWhiteImage() {
     }
 }
 void invertImage() {
+    // Here we invert every pixel by subtracting a 100 from it and placing the value in an abs function to get the absolute value
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             image [i][j] = abs(image[i][j]-100);
@@ -302,7 +309,7 @@ void invertImage() {
 }
 void mergeImageLoad() {
     char imageFileName[100];
-
+    // Same as loadImage() but for the second image
     // Get gray scale image file name to merge
     cout << "Please enter name of image file to merge with: ";
     cin >> imageFileName;
@@ -312,6 +319,7 @@ void mergeImageLoad() {
     readGSBMP(imageFileName, image2);
 }
 void mergeImage(){
+    // Here we merge the two images by adding the values of the pixels of the two images and dividing by 2
     for(int i =0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
             image3[i][j] = (image[i][j] + image2[i][j])/2;
@@ -319,6 +327,7 @@ void mergeImage(){
     }
 }
 void saveImage3() {
+    // Same as saveImage() but for the third image
     char imageFileName[100];
 
     // Get gray scale image target file name
@@ -330,6 +339,8 @@ void saveImage3() {
     writeGSBMP(imageFileName, image3);
 }
 void flipImageHorizontally() {
+    //Here we flip the given image horizontally by following a simple logic,
+    //we will access the columns in a reversed order instead of rows.
     for(int i =SIZE-1; i >=0;i--) {
         for(int j =0; j < SIZE;j++){
             image3[i][j] = image[i][SIZE-1-j];
@@ -337,6 +348,8 @@ void flipImageHorizontally() {
     }
 }
 void flipImageVertically() {
+    //Here we flip the given image vertically by following a simple logic,
+    //we just need to access the rows in a reversed order with the first for loop's value.
     for(int i =0; i <SIZE;i++) {
         for(int j =SIZE-1; j >=0;j--){
             image3[i][j] = image[SIZE -1 -i][j];
@@ -344,6 +357,8 @@ void flipImageVertically() {
     }
 }
 void flipVerticalHorizontal(){
+    //Here we flip the given image vertically and horizontally by following a simple logic,
+    //we just need to access the rows and columns in a reversed order with the first and second for loop's value.
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++){
             image3[i][j] = image[SIZE-i-1][SIZE-j-1];
@@ -351,6 +366,8 @@ void flipVerticalHorizontal(){
     }
 }
 void darkenImage() {
+    // Here we darken the image by subtracting 100 bits from every pixel ,but we have a minimum of 0 bits ,so we check if the value is less than 0
+    // if it is then we assign the value to 0.
     for(int i =0; i < SIZE; i++) {
         for(int j = 0; j < SIZE; j++){
             if(image[i][j] -100 <0) {image[i][j] =0;}
@@ -359,6 +376,8 @@ void darkenImage() {
     }
 }
 void lightenImage() {
+    // Here we lighten the image by adding 100 bits to every pixel ,but we have a maximum of 255 bits ,so we check if the value is greater than 255
+    // if it is then we assign the value to 255.
     for(int i =0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
             if(image[i][j] + 100 > 255) { image[i][j] = 255; }
@@ -367,11 +386,12 @@ void lightenImage() {
     }
 }
 void rotate90(){
+    // Here we rotate the image by 90 degrees by applying a simple logic,
+    // To achieve rotation by 90 degrees, we need to access the first image flipped vertically
+    // then we copy each row from the original flipped image to each column of our new image.
     int k =0, l=0;
-    for(int i =SIZE; i >= SIZE/256-1; i--)
-    {
-        for(int j = SIZE/256-1; j < SIZE; j++)
-        {
+    for(int i =SIZE; i >= SIZE/256-1; i--) {
+        for(int j = SIZE/256-1; j < SIZE; j++) {
             image3[l][k] = image[i][j];
             l++;
         }
@@ -380,6 +400,8 @@ void rotate90(){
     }
 }
 void rotate180(){
+    // Here we rotate the image by 180 degrees by applying a simple logic,
+    // we just need to access the rows and columns in a reversed order with the first and second for loop's value. (same as flipVerticalHorizontal())
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++){
             image3[i][j] = image[SIZE-i-1][SIZE-j-1];
@@ -387,6 +409,7 @@ void rotate180(){
     }
 }
 void rotate360() {
+    // Here we rotate the image by 360 degrees by copying the image to the new image as 360 degrees is the same as 0 degrees rotation.
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             image3[i][j] = image[i][j];
