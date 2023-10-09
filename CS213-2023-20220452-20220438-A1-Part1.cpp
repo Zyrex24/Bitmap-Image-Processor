@@ -1,6 +1,6 @@
 // FCAI – OOP Programming – 2023 - Assignment 1
 // Program Name:				imageModifier.cpp
-// Last Modification Date:	7/10/2023
+// Last Modification Date:	9/10/2023
 // Author1 and ID and Group:	Ahmed Niazi 20220452
 // Author2 and ID and Group:	Omer Tarek 20220438
 // Author3 and ID and Group:
