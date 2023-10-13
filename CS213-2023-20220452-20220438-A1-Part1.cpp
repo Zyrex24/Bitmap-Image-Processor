@@ -20,6 +20,8 @@ using namespace std;
 unsigned char image[SIZE][SIZE];
 unsigned char image2[SIZE][SIZE];
 unsigned char image3[SIZE][SIZE];
+unsigned char imageRGB[SIZE][SIZE][RGB];
+
 
 
 void loadImage();
@@ -48,8 +50,8 @@ void mirrorHalfImage(const char & direction);
 void shuffleImage(const int quarters[]);
 void blurImage();
 void cropImage(int x, int y, int l, int w);
-void skewImageRight();
-void skewImageUp();
+void skewImageRight(const double &degree);
+void skewImageUp(const double & degree);
 
 
 int main()
@@ -72,7 +74,6 @@ void menu() {
     cout << "4.  Flip Image" << endl;
     cout << "5.  Darken and Lighten Image" << endl;
     cout << "6.  Rotate Image" << endl;
-    cout << "-----Under Development-----" << endl;
     cout << "7.  Detect Image Edges" << endl;
     cout << "8.  Enlarge Image" << endl;
     cout << "9.  Shrink Image" << endl;
@@ -83,7 +84,6 @@ void menu() {
     cout << "e.  Skew Image Right" << endl;
     cout << "f.  Skew Image Up" << endl;
     cout << "s.  Save the image to a file" << endl;
-    cout << "-----end-----" << endl;
     cout << "0.  Exit" << endl;
     cout << "---------------------------------------------" << endl;
     cout << "Enter your choice: ";    cin >> selection;
@@ -174,7 +174,7 @@ void menu1(string & s) {
         case 7:
             // Detect Image Edges
             detectImageEdges();
-            saveImage();
+            saveImage3();
             break;
         case 8:
             // Enlarge Image
@@ -237,13 +237,19 @@ void menu2(string & s) {
         cropImage(x, y, l, w);
         saveImage3();
     }else if (s == "e") {
-        // Skew Image Right
-        cout << "Under Development\n";
-        menu();
-    }else if (s == "f") {
         // Skew Image Up
-        cout << "Under Development\n";
-        menu();
+        double degree;
+        cout << "Please enter degree to skew right: \t";
+        cin >> degree; cout << endl;
+        skewImageRight(degree);
+        saveImage3();
+    }else if (s == "f") {
+        // Skew Image Right
+        cout << "Please enter degree to skew Up: \t";
+        double degree;
+        cin >> degree; cout << endl;
+        skewImageUp(degree);
+        saveImage3();
     }else if (s == "s") {
         // Save the image to a file
         saveImage();
@@ -417,16 +423,38 @@ void rotate360() {
     }
 }
 void detectImageEdges() {
-    for(int i = 1; i < SIZE-1;i++) {
-        for(int j =1; j < SIZE-1; j++) {
-            if(abs(image[i-1][j]-image[i][j])>=40)image[i-1][j]=0;
-            else if(abs(image[i][j-1]-image[i][j])>=40)image[i][j]=0;
+    // Here we detect the edges of the image using the Sobel kernels method.
+    int kernelX[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
+    int kernelY[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
+    //loop through the image, leaving a 1-pixel border, to find edges.
+    for (int y = 1; y < SIZE - 1; ++y) {
+        for (int x = 1; x < SIZE - 1; ++x) {
+            int gradX = 0;
+            int gradY = 0;
+            // Apply Sobel kernels to the image.
+            for (int i = -1; i <= 1; ++i) {
+                for (int j = -1; j <= 1; ++j) {
+                    int pixelX = x + j;
+                    int pixelY = y + i;
+                    gradX += kernelX[i + 1][j + 1] * image[pixelY][pixelX];
+                    gradY += kernelY[i + 1][j + 1] * image[pixelY][pixelX];
+                }
+            }
+            int size1 = sqrt(gradX * gradX + gradY * gradY);
+            // Set the image to white and the edge pixels to black.
+            if (size1 > 128) {
+                image3[y][x] = 0;
+            } else {
+                image3[y][x] = 255;
+            }
         }
     }
-    for(auto & i : image) {
-        for(int j = 0; j < SIZE; j++) {
-            if(i[j] || (j+1 <SIZE && i[j] == i[j+1]))i[j] =255;
-        }
+    // Set the border pixels to white
+    for (int i = 0; i < SIZE; ++i) {
+        image3[0][i] = 255;
+        image3[SIZE - 1][i] = 255;
+        image3[i][0] = 255;
+        image3[i][SIZE - 1] = 255;
     }
 }
 void enlargeImage(const string &quarter) {
@@ -436,34 +464,25 @@ void enlargeImage(const string &quarter) {
     for (int i = 0, l = l_start, p = 2; i < SIZE; i++) {
         for (int j = 0, k = k_start, p2 = 0; j < SIZE; j++) {
             image3[i][j] = image[l][k];
-
             if (!p2) k++,p2 = 1;
             else p2--;
-
         }
-
         if (!p) l++,p = 1;
         else p--;
-
     }
 }
 void shrinkImage(const string& shrink_by){
     string last_char = shrink_by.substr(shrink_by.length()-1, 1);
-
     float shrink = stoi(last_char);
-
     int new_size = SIZE/shrink;
-    for(int i =0, l = 0; i < new_size; i++, l += shrink)
-    {
-        for(int j = 0, k = 0; j < new_size; j++, k+= shrink)
-        {
+    for(int i =0, l = 0; i < new_size; i++, l += shrink) {
+        for(int j = 0, k = 0; j < new_size; j++, k+= shrink) {
             image3[i][j] = image[l][k];
         }
     }
 }
 void mirrorHalfImage(const char & direction) {
-    if(direction == 'l')
-    {
+    if(direction == 'l') {
         int add = 1, k=0;
         for(int i = 0; i < SIZE; i++) {
             for(int j = 0; j < SIZE; j++) {
@@ -475,8 +494,7 @@ void mirrorHalfImage(const char & direction) {
             }
         }
     }
-    else if(direction == 'r')
-    {
+    else if(direction == 'r') {
         int k = 255, minus = 1;
         for(int i = 0; i < SIZE; i++) {
             for(int j = 0; j < SIZE; j++) {
@@ -499,9 +517,7 @@ void mirrorHalfImage(const char & direction) {
                 image3[i][j] = image[l][j];
             }
         }
-    }
-    else
-    {
+    }else{
         int l = 255, minus = 1;
         for(int i = 0; i < SIZE; i++) {
             if(i == SIZE/2)minus=0;
@@ -539,7 +555,13 @@ void shuffleImage(const int quarters[]) {
 void blurImage() {
     for(int i =0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
-            image3[i][j] = (image[i][j] + image[i+3][j] + image[i-3][j] + image[i][j+3] + image[i][j-3] + image[i+2][j+2] + image[i-2][j-2])/7;
+            if(j-1 >=0 && i-1>=0 && j+1 < SIZE && i-1 < SIZE)
+            {
+                image3[i][j] = round((image[i][j]+image[i+1][j]+image[i-1][j]+
+                                      image[i][j+1] + image[i][j-1]  + image[i-1][j-1]+
+                                      image[i-1][j+1] + image[i+1][j-1] + image[i+1][j+1])/9);
+            }
+            else image3[i][j] = image[i][j];
         }
     }
 }
@@ -550,12 +572,44 @@ void cropImage(int x, int y, int l, int w) {
         }
     }
 }
-//Under Development
-void skewImageRight() {
-    cout << "Under Development\n";
-    menu();
+void skewImageRight(const double &degree) {
+    const double pi = M_PI;
+    auto new_size = 256 /(1+1/(tan(degree * pi /180)));
+    int jump = floor(SIZE/ new_size);
+    auto new_start = floor(SIZE - new_size);
+    auto move = new_start / SIZE, copy = new_start;
+    double white_img;
+    for(int i = 0; i < SIZE; i++) {
+        for(int j =0, k = 0; j < new_size; j++, k += jump) {
+            image2[i][j] = image[i][k];
+        }
+    }
+    for(int i =0, l = int(new_start); i < SIZE;i++) {
+        for(int j = 0 ; j <new_size;j++) {
+            image3[i][j+int(new_start)]= image2[i][j];
+            white_img = j + new_start;
+        }
+        new_start-=move;
+    }
 }
-void skewImageUp() {
-    cout << "Under Development\n";
-    menu();
+void skewImageUp(const double & degree) {
+    const double pi = M_PI;
+    auto new_size = 256 /(1+1/(tan(degree * pi /180)));
+    int jump = floor(SIZE/ new_size);
+    auto new_start = floor(SIZE - new_size);
+    auto move = new_start / SIZE, copy = new_start;
+    double white_img;
+    for(int i = 0, l = 0; i < new_size; i++, l += jump) {
+        for(int j =0; j < SIZE; j++) {
+            image2[i][j] = image[l][j];
+        }
+    }
+    for(int i =0; i < new_size;i++) {
+        for(int j = 0 ; j < SIZE;j++) {
+            image3[i+int(new_start)][j]= image2[i][j];
+            new_start-=move;
+        }
+        new_start = copy;
+        white_img = i + new_start;
+    }
 }
