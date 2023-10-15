@@ -1,8 +1,8 @@
 // FCAI – OOP Programming – 2023 - Assignment 1
-// Program Name:				imageModifier.cpp
+// Program Name:				CS213-2023-20220452-20220438-A1-Part1.cpp
 // Last Modification Date:	7/10/2023
 // Author1 and ID and Group:	Ahmed Niazi 20220452
-// Author2 and ID and Group:	Omer Tarek 20220438
+// Author2 and ID and Group:	Omar Tarek 20220438
 // Author3 and ID and Group:
 // Teaching Assistant:
 // Purpose: Apply a variety of filters on grayscale bmp images
@@ -12,24 +12,22 @@
 #include <string>
 #include <cstring>
 #include <cmath>
+#include <algorithm>
 #include "bmplib.cpp"
-/*#include <vector>
-#include <fstream>*/
+
 
 using namespace std;
 unsigned char image[SIZE][SIZE];
 unsigned char image2[SIZE][SIZE];
 unsigned char image3[SIZE][SIZE];
-unsigned char imageRGB[SIZE][SIZE][RGB];
-
 
 
 void loadImage();
 void saveImage();
 /*------------------*/
 void menu();
-void menu1(string & s);
-void menu2(string & s);
+void menu1(string& s);
+void menu2(string& s);
 void blackWhiteImage();
 void invertImage();
 void mergeImageLoad();
@@ -44,18 +42,21 @@ void rotate90();
 void rotate180();
 void rotate360();
 void detectImageEdges();
-void enlargeImage(const string &quarter);
+void enlargeImage(const string& quarter);
 void shrinkImage(const string& shrink_by);
-void mirrorHalfImage(const char & direction);
+void mirrorHalfImage(const char& direction);
 void shuffleImage(const int quarters[]);
 void blurImage();
-void cropImage(int x, int y, int l, int w);
-void skewImageRight(const double &degree);
-void skewImageUp(const double & degree);
+void cropImage(const int& x, const int& y, const int& l, const int& w);
+void skewImageRight(const double& degree);
+void skewImageUp(const double& degree);
 
 
 int main()
 {
+    fill(&image[0][0], &image[0][0] + SIZE * SIZE, 255);
+    fill(&image2[0][0], &image2[0][0] + SIZE * SIZE, 255);
+    fill(&image3[0][0], &image3[0][0] + SIZE * SIZE, 255);
     cout << "Welcome our Dear User :) \n\n";
     loadImage();
     menu();
@@ -101,110 +102,113 @@ void menu() {
         if (anns == 0) {
             cout << "Thank you for using our program :)" << endl;
             return;
-        } else if (anns == 1) {
+        }
+        else if (anns == 1) {
             menu();
         }
     }
 }
 // Here we take the user's choice (ranging from 0-9) and apply the filter on the image.
-void menu1(string & s) {
+void menu1(string& s) {
     string choice;
     int selection = stoi(s);
     switch (selection) {
-        case 0:
-            // Exit
+    case 0:
+        // Exit
+        cout << "Thank you for using our program :)" << endl;
+        break;
+    case 1:
+        // Convert to Black and White
+        blackWhiteImage();
+        saveImage3();
+        break;
+    case 2:
+        // Invert Filter
+        invertImage();
+        saveImage3();
+        break;
+    case 3:
+        // Merge Filter
+        mergeImageLoad();
+        mergeImage();
+        saveImage3();
+        break;
+    case 4:
+        // Flip Image
+        char ans;
+        cout << "Flip (h)orizontally or (v)ertically or (b)oth?\t";
+        cin >> ans;
+        cout << endl;
+        if (ans == 'h')
+            flipImageHorizontally();
+        else if (ans == 'v')
+            flipImageVertically();
+        else if (ans == 'b')
+            flipVerticalHorizontal();
+        saveImage3();
+        break;
+    case 5:
+        // Darken and Lighten Image
+        char answer;
+        cout << "Do you want to (d)arken or (l)ighten?\t";
+        cin >> answer;
+        cout << endl;
+        if (answer == 'd')
+            darkenImage();
+        else if (answer == 'l')
+            lightenImage();
+        saveImage3();
+        break;
+    case 6:
+        // Rotate Image
+        int answe;
+        cout << "Rotate (90), (180) or (360) degrees?\t";
+        cin >> answe;
+        cout << endl;
+        if (answe == 90)
+            rotate90();
+        else if (answe == 180)
+            rotate180();
+        else if (answe == 360)
+            rotate360();
+        saveImage3();
+        break;
+    case 7:
+        // Detect Image Edges
+        detectImageEdges();
+        saveImage3();
+        break;
+    case 8:
+        // Enlarge Image
+        cout << "Which quarter to enlarge 1, 2, 3 or 4?\t";
+        cin >> choice;
+        if (stoi(choice) >= 1 && stoi(choice) <= 4) {
+            enlargeImage(choice), saveImage3();
+            break;
+        }
+        else { cout << "Invalid number!\n";menu(); }
+    case 9:
+        // Shrink Image
+        cout << "Shrink to (1/2), (1/3) or (1/4)?\t";
+        cin >> choice;
+        shrinkImage(choice);
+        saveImage3();
+        break;
+    default:
+        int anns;
+        cout << "Invalid choice, Please press 0 to exit or 1 to choose again from the menu: ";
+        cin >> anns;
+        cout << endl;
+        if (anns == 0) {
             cout << "Thank you for using our program :)" << endl;
             break;
-        case 1:
-            // Convert to Black and White
-            blackWhiteImage();
-            saveImage();
-            break;
-        case 2:
-            // Invert Filter
-            invertImage();
-            saveImage();
-            break;
-        case 3:
-            // Merge Filter
-            mergeImageLoad();
-            mergeImage();
-            saveImage3();
-            break;
-        case 4:
-            // Flip Image
-            char ans;
-            cout << "Flip (h)orizontally or (v)ertically or (b)oth?\t";
-            cin >> ans;
-            cout << endl;
-            if (ans == 'h')
-                flipImageHorizontally();
-            else if (ans == 'v')
-                flipImageVertically();
-            else if (ans == 'b')
-                flipVerticalHorizontal();
-            saveImage3();
-            break;
-        case 5:
-            // Darken and Lighten Image
-            char answer;
-            cout << "Do you want to (d)arken or (l)ighten?\t";
-            cin >> answer;
-            cout << endl;
-            if (answer == 'd')
-                darkenImage();
-            else if (answer == 'l')
-                lightenImage();
-            saveImage();
-            break;
-        case 6:
-            // Rotate Image
-            int answe;
-            cout << "Rotate (90), (180) or (360) degrees?\t";
-            cin >> answe;
-            cout << endl;
-            if (answe == 90)
-                rotate90();
-            else if (answe == 180)
-                rotate180();
-            else if (answe == 360)
-                rotate360();
-            saveImage3();
-            break;
-        case 7:
-            // Detect Image Edges
-            detectImageEdges();
-            saveImage3();
-            break;
-        case 8:
-            // Enlarge Image
-            cout << "Which quarter to enlarge 1, 2, 3 or 4?\t";
-            cin >> choice;
-            if(stoi(choice) >=1 && stoi(choice) <=4){
-                enlargeImage(choice), saveImage3();
-                break;}
-            else {cout <<"Invalid number!\n";menu();}
-        case 9:
-            // Shrink Image
-            cout << "Shrink to (1/2), (1/3) or (1/4)?\t";
-            cin >> choice;
-            shrinkImage(choice);
-            saveImage3();
-            break;
-        default:
-            int anns;
-            cout << "Invalid choice, Please press 0 to exit or 1 to choose again from the menu: ";
-            cin >> anns;
-            cout << endl;
-            if (anns == 0) {
-                cout << "Thank you for using our program :)" << endl;
-                break;
-            } else if (anns == 1) {
-                menu();
-            }
+        }
+        else if (anns == 1) {
+            menu();
+        }
     }
 }
-void menu2(string & s) {
+void menu2(string& s) {
     // Here we take the user's choice (ranging from a-f,s) and apply the filter on the image.
     if (s == "a") {
         // Mirror 1/2 Image
@@ -214,46 +218,54 @@ void menu2(string & s) {
         cout << endl;
         if (direction == 'l' || direction == 'r' || direction == 'u' || direction == 'd') {
             mirrorHalfImage(direction), saveImage3();
-        }else {
+        }
+        else {
             cout << "Invalid direction!\n";
             menu();
         }
-    }else if (s == "b") {
+    }
+    else if (s == "b") {
         // Shuffle Image
         int quarters[4];
         cout << "New order of quarters ?\t";
         cin >> quarters[0] >> quarters[1] >> quarters[2] >> quarters[3]; cout << endl;
         shuffleImage(quarters);
         saveImage3();
-    }else if (s == "c") {
+    }
+    else if (s == "c") {
         // Blur Image
         blurImage();
         saveImage3();
-    }else if (s == "d") {
+    }
+    else if (s == "d") {
         // Crop Image
         int x, y, l, w;
         cout << "Please enter x y l w: \t";
         cin >> x >> y >> l >> w; cout << endl;
         cropImage(x, y, l, w);
         saveImage3();
-    }else if (s == "e") {
+    }
+    else if (s == "e") {
         // Skew Image Up
         double degree;
         cout << "Please enter degree to skew right: \t";
         cin >> degree; cout << endl;
         skewImageRight(degree);
         saveImage3();
-    }else if (s == "f") {
+    }
+    else if (s == "f") {
         // Skew Image Right
         cout << "Please enter degree to skew Up: \t";
         double degree;
         cin >> degree; cout << endl;
         skewImageUp(degree);
         saveImage3();
-    }else if (s == "s") {
+    }
+    else if (s == "s") {
         // Save the image to a file
         saveImage();
-    }else {
+    }
+    else {
         int anns;
         cout << "Invalid choice, Please press 0 to exit or 1 to choose again from the menu: ";
         cin >> anns;
@@ -309,7 +321,7 @@ void invertImage() {
     // Here we invert every pixel by subtracting a 100 from it and placing the value in an abs function to get the absolute value
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            image [i][j] = abs(image[i][j]-100);
+            image[i][j] = abs(image[i][j] - 100);
         }
     }
 }
@@ -324,11 +336,11 @@ void mergeImageLoad() {
     strcat(imageFileName, ".bmp");
     readGSBMP(imageFileName, image2);
 }
-void mergeImage(){
+void mergeImage() {
     // Here we merge the two images by adding the values of the pixels of the two images and dividing by 2
-    for(int i =0; i < SIZE; i++){
-        for(int j = 0; j < SIZE; j++){
-            image3[i][j] = (image[i][j] + image2[i][j])/2;
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            image3[i][j] = (image[i][j] + image2[i][j]) / 2;
         }
     }
 }
@@ -347,70 +359,70 @@ void saveImage3() {
 void flipImageHorizontally() {
     //Here we flip the given image horizontally by following a simple logic,
     //we will access the columns in a reversed order instead of rows.
-    for(int i =SIZE-1; i >=0;i--) {
-        for(int j =0; j < SIZE;j++){
-            image3[i][j] = image[i][SIZE-1-j];
+    for (int i = SIZE - 1; i >= 0;i--) {
+        for (int j = 0; j < SIZE;j++) {
+            image3[i][j] = image[i][SIZE - 1 - j];
         }
     }
 }
 void flipImageVertically() {
     //Here we flip the given image vertically by following a simple logic,
     //we just need to access the rows in a reversed order with the first for loop's value.
-    for(int i =0; i <SIZE;i++) {
-        for(int j =SIZE-1; j >=0;j--){
-            image3[i][j] = image[SIZE -1 -i][j];
+    for (int i = 0; i < SIZE;i++) {
+        for (int j = SIZE - 1; j >= 0;j--) {
+            image3[i][j] = image[SIZE - 1 - i][j];
         }
     }
 }
-void flipVerticalHorizontal(){
+void flipVerticalHorizontal() {
     //Here we flip the given image vertically and horizontally by following a simple logic,
     //we just need to access the rows and columns in a reversed order with the first and second for loop's value.
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++){
-            image3[i][j] = image[SIZE-i-1][SIZE-j-1];
+        for (int j = 0; j < SIZE; j++) {
+            image3[i][j] = image[SIZE - i - 1][SIZE - j - 1];
         }
     }
 }
 void darkenImage() {
     // Here we darken the image by subtracting 100 bits from every pixel ,but we have a minimum of 0 bits ,so we check if the value is less than 0
     // if it is then we assign the value to 0.
-    for(int i =0; i < SIZE; i++) {
-        for(int j = 0; j < SIZE; j++){
-            if(image[i][j] -100 <0) {image[i][j] =0;}
-            else {image[i][j] -= 100;}
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (image[i][j] - 100 < 0) { image[i][j] = 0; }
+            else { image[i][j] -= 100; }
         }
     }
 }
 void lightenImage() {
     // Here we lighten the image by adding 100 bits to every pixel ,but we have a maximum of 255 bits ,so we check if the value is greater than 255
     // if it is then we assign the value to 255.
-    for(int i =0; i < SIZE; i++){
-        for(int j = 0; j < SIZE; j++){
-            if(image[i][j] + 100 > 255) { image[i][j] = 255; }
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (image[i][j] + 100 > 255) { image[i][j] = 255; }
             else { image[i][j] += 100; }
         }
     }
 }
-void rotate90(){
+void rotate90() {
     // Here we rotate the image by 90 degrees by applying a simple logic,
     // To achieve rotation by 90 degrees, we need to access the first image flipped vertically
     // then we copy each row from the original flipped image to each column of our new image.
-    int k =0, l=0;
-    for(int i =SIZE; i >= SIZE/256-1; i--) {
-        for(int j = SIZE/256-1; j < SIZE; j++) {
+    int k = 0, l = 0;
+    for (int i = SIZE; i >= SIZE / 256 - 1; i--) {
+        for (int j = SIZE / 256 - 1; j < SIZE; j++) {
             image3[l][k] = image[i][j];
             l++;
         }
-        l =0;
+        l = 0;
         k++;
     }
 }
-void rotate180(){
+void rotate180() {
     // Here we rotate the image by 180 degrees by applying a simple logic,
     // we just need to access the rows and columns in a reversed order with the first and second for loop's value. (same as flipVerticalHorizontal())
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++){
-            image3[i][j] = image[SIZE-i-1][SIZE-j-1];
+        for (int j = 0; j < SIZE; j++) {
+            image3[i][j] = image[SIZE - i - 1][SIZE - j - 1];
         }
     }
 }
@@ -424,8 +436,12 @@ void rotate360() {
 }
 void detectImageEdges() {
     // Here we detect the edges of the image using the Sobel kernels method.
-    int kernelX[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
-    int kernelY[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
+    int kernelX[3][3] = { {-1, 0, 1},
+                         {-2, 0, 2},
+                         {-1, 0, 1} };
+    int kernelY[3][3] = { {-1, -2, -1},
+                         {0, 0, 0},
+                         {1, 2, 1} };
     //loop through the image, leaving a 1-pixel border, to find edges.
     for (int y = 1; y < SIZE - 1; ++y) {
         for (int x = 1; x < SIZE - 1; ++x) {
@@ -444,7 +460,8 @@ void detectImageEdges() {
             // Set the image to white and the edge pixels to black.
             if (size1 > 128) {
                 image3[y][x] = 0;
-            } else {
+            }
+            else {
                 image3[y][x] = 255;
             }
         }
@@ -457,157 +474,158 @@ void detectImageEdges() {
         image3[i][SIZE - 1] = 255;
     }
 }
-void enlargeImage(const string &quarter) {
+void enlargeImage(const string& quarter) {
+
     int l_start, k_start, val = stoi(quarter);
-    l_start = (val >2?128:0);
-    k_start = (val % 2 == 0?128:0);
+    l_start = (val > 2 ? 128 : 0);
+    k_start = (val % 2 == 0 ? 128 : 0);
     for (int i = 0, l = l_start, p = 2; i < SIZE; i++) {
         for (int j = 0, k = k_start, p2 = 0; j < SIZE; j++) {
             image3[i][j] = image[l][k];
-            if (!p2) k++,p2 = 1;
+            if (!p2) k++, p2 = 1;
             else p2--;
         }
-        if (!p) l++,p = 1;
+        if (!p) l++, p = 1;
         else p--;
     }
 }
-void shrinkImage(const string& shrink_by){
-    string last_char = shrink_by.substr(shrink_by.length()-1, 1);
-    float shrink = stoi(last_char);
-    int new_size = SIZE/shrink;
-    for(int i =0, l = 0; i < new_size; i++, l += shrink) {
-        for(int j = 0, k = 0; j < new_size; j++, k+= shrink) {
+void shrinkImage(const string& shrink_by) {
+    string last_char = shrink_by.substr(shrink_by.length() - 1, 1);
+    int shrink = stoi(last_char);
+    int new_size = SIZE / shrink;
+    for (int i = 0, l = 0; i < new_size; i++, l += shrink) {
+        for (int j = 0, k = 0; j < new_size; j++, k += shrink) {
             image3[i][j] = image[l][k];
         }
     }
 }
-void mirrorHalfImage(const char & direction) {
-    if(direction == 'l') {
-        int add = 1, k=0;
-        for(int i = 0; i < SIZE; i++) {
-            for(int j = 0; j < SIZE; j++) {
-                if(j == SIZE/2)add=0;
-                if(add)k++;
+void mirrorHalfImage(const char& direction) {
+    if (direction == 'l') {
+        int add = 1, k = 0;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (j == SIZE / 2)add = 0;
+                if (add)k++;
                 else k--;
-                if(!add && !k)add=1;
+                if (!add && !k)add = 1;
                 image3[i][j] = image[i][k];
             }
         }
     }
-    else if(direction == 'r') {
+    else if (direction == 'r') {
         int k = 255, minus = 1;
-        for(int i = 0; i < SIZE; i++) {
-            for(int j = 0; j < SIZE; j++) {
-                if(j == SIZE/2)minus=0;
-                if(minus)k--;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (j == SIZE / 2)minus = 0;
+                if (minus)k--;
                 else k++;
-                if(!minus && k == 255)minus=1;
+                if (!minus && k == 255)minus = 1;
                 image3[i][j] = image[i][k];
             }
         }
     }
-    else if(direction == 'u') {
+    else if (direction == 'u') {
         int add = 1, l = 0;
-        for(int i = 0; i < SIZE ; i++) {
-            if(i == SIZE/2)add=0;
-            if(add)l++;
+        for (int i = 0; i < SIZE; i++) {
+            if (i == SIZE / 2)add = 0;
+            if (add)l++;
             else l--;
-            if(!add && !l)add=1;
-            for(int j = 0; j < SIZE; j++) {
+            if (!add && !l)add = 1;
+            for (int j = 0; j < SIZE; j++) {
                 image3[i][j] = image[l][j];
             }
         }
-    }else{
+    }
+    else {
         int l = 255, minus = 1;
-        for(int i = 0; i < SIZE; i++) {
-            if(i == SIZE/2)minus=0;
-            if(minus)l--;
+        for (int i = 0; i < SIZE; i++) {
+            if (i == SIZE / 2)minus = 0;
+            if (minus)l--;
             else l++;
-            if(!minus && l == 255)minus=1;
-            for(int j = 0; j < SIZE; j++) {
+            if (!minus && l == 255)minus = 1;
+            for (int j = 0; j < SIZE; j++) {
                 image3[i][j] = image[l][j];
             }
         }
     }
 }
 void shuffleImage(const int quarters[]) {
-    for(int i =0, start = (quarters[0] >2?128:0); i < SIZE/2;i++, start ++) {
-        for(int j =0, start2 = (quarters[0] %2 ==0?128:0); j <SIZE/2;j++, start2 ++) {
+    for (int i = 0, start = (quarters[0] > 2 ? 128 : 0); i < SIZE / 2;i++, start++) {
+        for (int j = 0, start2 = (quarters[0] % 2 == 0 ? 128 : 0); j < SIZE / 2;j++, start2++) {
             image3[i][j] = image[start][start2];
         }
     }
-    for(int i =0, start = (quarters[1] >2?128:0); i < SIZE/2;i++, start ++) {
-        for(int j =128, start2 = (quarters[1] %2 ==0?128:0); j <SIZE;j++, start2 ++) {
+    for (int i = 0, start = (quarters[1] > 2 ? 128 : 0); i < SIZE / 2;i++, start++) {
+        for (int j = 128, start2 = (quarters[1] % 2 == 0 ? 128 : 0); j < SIZE;j++, start2++) {
             image3[i][j] = image[start][start2];
         }
     }
-    for(int i =128, start = (quarters[2] >2?128:0); i < SIZE;i++, start ++) {
-        for(int j =0, start2 = (quarters[2] %2 ==0?128:0); j <SIZE/2;j++, start2 ++) {
+    for (int i = 128, start = (quarters[2] > 2 ? 128 : 0); i < SIZE;i++, start++) {
+        for (int j = 0, start2 = (quarters[2] % 2 == 0 ? 128 : 0); j < SIZE / 2;j++, start2++) {
             image3[i][j] = image[start][start2];
         }
     }
-    for(int i =128, start = (quarters[3] >2?128:0); i < SIZE;i++, start ++) {
-        for(int j =128, start2 = (quarters[3] %2 ==0?128:0); j <SIZE;j++, start2 ++) {
+    for (int i = 128, start = (quarters[3] > 2 ? 128 : 0); i < SIZE;i++, start++) {
+        for (int j = 128, start2 = (quarters[3] % 2 == 0 ? 128 : 0); j < SIZE;j++, start2++) {
             image3[i][j] = image[start][start2];
         }
     }
 }
 void blurImage() {
-    for(int i =0; i < SIZE; i++){
-        for(int j = 0; j < SIZE; j++){
-            if(j-1 >=0 && i-1>=0 && j+1 < SIZE && i-1 < SIZE)
-            {
-                image3[i][j] = round((image[i][j]+image[i+1][j]+image[i-1][j]+
-                                      image[i][j+1] + image[i][j-1]  + image[i-1][j-1]+
-                                      image[i-1][j+1] + image[i+1][j-1] + image[i+1][j+1])/9);
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (j - 1 >= 0 && i - 1 >= 0 && j + 1 < SIZE && i - 1 < SIZE) {
+                image3[i][j] = round((image[i][j] + image[i + 1][j] + image[i - 1][j] +
+                    image[i][j + 1] + image[i][j - 1] + image[i - 1][j - 1] +
+                    image[i - 1][j + 1] + image[i + 1][j - 1] + image[i + 1][j + 1]) / 9);
             }
             else image3[i][j] = image[i][j];
         }
     }
 }
-void cropImage(int x, int y, int l, int w) {
-    for (int i = x; i < x+l; i++) {
-        for (int j = y; j < y+w; j++) {
+void cropImage(const int& x, const int& y, const int& l, const int& w) {
+    for (int i = x; i < x + l; i++) {
+        for (int j = y; j < y + w; j++) {
             image3[i][j] = image[i][j];
         }
     }
 }
-void skewImageRight(const double &degree) {
+void skewImageRight(const double& degree) {
     const double pi = M_PI;
-    auto new_size = 256 /(1+1/(tan(degree * pi /180)));
-    int jump = floor(SIZE/ new_size);
+    auto new_size = 256 / (1 + 1 / (tan(degree * pi / 180)));
+    int jump = floor(SIZE / new_size);
     auto new_start = floor(SIZE - new_size);
     auto move = new_start / SIZE, copy = new_start;
     double white_img;
-    for(int i = 0; i < SIZE; i++) {
-        for(int j =0, k = 0; j < new_size; j++, k += jump) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0, k = 0; j < new_size; j++, k += jump) {
             image2[i][j] = image[i][k];
         }
     }
-    for(int i =0, l = int(new_start); i < SIZE;i++) {
-        for(int j = 0 ; j <new_size;j++) {
-            image3[i][j+int(new_start)]= image2[i][j];
+    for (int i = 0, l = int(new_start); i < SIZE;i++) {
+        for (int j = 0; j < new_size;j++) {
+            image3[i][j + int(new_start)] = image2[i][j];
             white_img = j + new_start;
         }
-        new_start-=move;
+        new_start -= move;
     }
 }
-void skewImageUp(const double & degree) {
+void skewImageUp(const double& degree) {
     const double pi = M_PI;
-    auto new_size = 256 /(1+1/(tan(degree * pi /180)));
-    int jump = floor(SIZE/ new_size);
+    auto new_size = 256 / (1 + 1 / (tan(degree * pi / 180)));
+    int jump = floor(SIZE / new_size);
     auto new_start = floor(SIZE - new_size);
     auto move = new_start / SIZE, copy = new_start;
     double white_img;
-    for(int i = 0, l = 0; i < new_size; i++, l += jump) {
-        for(int j =0; j < SIZE; j++) {
+    for (int i = 0, l = 0; i < new_size; i++, l += jump) {
+        for (int j = 0; j < SIZE; j++) {
             image2[i][j] = image[l][j];
         }
     }
-    for(int i =0; i < new_size;i++) {
-        for(int j = 0 ; j < SIZE;j++) {
-            image3[i+int(new_start)][j]= image2[i][j];
-            new_start-=move;
+    for (int i = 0; i < new_size;i++) {
+        for (int j = 0; j < SIZE;j++) {
+            image3[i + int(new_start)][j] = image2[i][j];
+            new_start -= move;
         }
         new_start = copy;
         white_img = i + new_start;
