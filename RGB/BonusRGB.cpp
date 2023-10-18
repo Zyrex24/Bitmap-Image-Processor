@@ -1,10 +1,9 @@
 // FCAI – OOP Programming – 2023 - Assignment 1
-// Program Name:				CS213-2023-20220452-20220438-A1-Part1.cpp
-// Last Modification Date:	15/10/2023
+// Program Name:				CS213-2023-20220452-20220438-A1Bonus.cpp
+// Last Modification Date:	18/10/2023
 // Author1 and ID and Group:	Ahmed Niazi 20220452  S17
 // Author2 and ID and Group:	Omar Tarek 20220438  S17
-// Author3 and ID and Group:
-// Teaching Assistant:
+// Teaching Assistant: Section 17
 // Purpose: Apply a variety of filters on RGB bmp images
 
 
@@ -65,9 +64,9 @@ int main()
 
 void initialize() {
     // Here we initialize the image to white.
-    fill (image[0][0], image[0][0] + SIZE*SIZE*RGB, 255);
-    fill (image2[0][0], image2[0][0] + SIZE*SIZE*RGB, 255);
-    fill (image3[0][0], image3[0][0] + SIZE*SIZE*RGB, 255);
+    fill (&image[0][0][0], &image[0][0][0] + SIZE*SIZE*RGB, 255);
+    fill (&image2[0][0][0], &image2[0][0][0] + SIZE*SIZE*RGB, 255);
+    fill (&image3[0][0][0], &image3[0][0][0] + SIZE*SIZE*RGB, 255);
     cout << "Welcome our Dear User :) \n\n";
 }
 void menu() {
