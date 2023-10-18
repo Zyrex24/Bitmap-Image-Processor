@@ -124,12 +124,12 @@ void menu1(string & s) {
         case 1:
             // Convert to Black and White
             blackWhiteImage();
-            saveImage3();
+            saveImage();
             break;
         case 2:
             // Invert Filter
             invertImage();
-            saveImage3();
+            saveImage();
             break;
         case 3:
             // Merge Filter
@@ -161,7 +161,7 @@ void menu1(string & s) {
                 darkenImage();
             else if (answer == 'l')
                 lightenImage();
-            saveImage3();
+            saveImage();
             break;
         case 6:
             // Rotate Image
@@ -315,7 +315,7 @@ void invertImage() {
     // Here we invert every pixel by subtracting a 100 from it and placing the value in an abs function to get the absolute value
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            image [i][j] = abs(image[i][j]-100);
+            image [i][j] = abs(image[i][j]-255);
         }
     }
 }
