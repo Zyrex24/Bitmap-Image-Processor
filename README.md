@@ -1,2 +1,3 @@
-# CS213-2023-20220452-20220438-A1-Part1
-Image Processing Using C++
+A tool in C++ using Structred Programming concept that allows users to apply
+various filters to bitmap images, such as blurring, sharpening, grayscale conversion, etc... . Under supervision from
+Dr. Mohammad El-Ramly.
